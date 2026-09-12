@@ -13,17 +13,13 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import type { User } from "./types";
 import {useState, useEffect} from "react";
+import { useAuthStore } from './store/authStore';
 
 // Layout con Header para páginas autenticadas
 function AppLayout({ children }: { children: ReactNode }) {
+  const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-  const role = localStorage.getItem("userRole") as User["role"] | null;
-  const name = localStorage.getItem("userName") || "";
-  const user = role
-    ? ({ id: 1, name, email: "", role, token: "" } as User)
-    : undefined;
   const [showWelcome, setShowWelcome] = useState(true); 
 
   useEffect(() => {                        
@@ -34,14 +30,12 @@ function AppLayout({ children }: { children: ReactNode }) {
   }, []);
     
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userName");
+    logout();
     navigate("/login");
   };
   return (
     <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
-      <Header user={user} onLogout={handleLogout} showWelcome={showWelcome} />
+      <Header user={user ?? undefined} onLogout={handleLogout} showWelcome={showWelcome} />
       <main>{children}</main>
     </div>
   );
