@@ -1,7 +1,7 @@
 // src/App.tsx
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Header from './layouts/Header';
 import LoginPage from './pages/LoginPage';
@@ -10,6 +10,7 @@ import EmployeesPage from './pages/EmployeesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleGuard from './components/RoleGuard';
 import { useAuthStore } from './store/authStore';
+import NotFoundPage from './pages/NotFoundPage';
 
 // Layout con Header para páginas autenticadas
 function AppLayout({ children }: { children: ReactNode }) {
@@ -70,12 +71,8 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {/* 404 */}
-        <Route path="*" element={
-          <div style={{ minHeight: '100vh', background: '#f8fafc', textAlign: 'center', padding: '80px' }}>
-            <h2 style={{ color: '#1e293b' }}>404: Página no encontrada</h2>
-            <Link to="/dashboard">Volver al inicio</Link>
-          </div>
-        } />
+           <Route path="*" element={<NotFoundPage />} />
+           
       </Routes>
 
       <Toaster
