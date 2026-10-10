@@ -9,6 +9,7 @@ import EmployeeForm from '../components/EmployeeForm';
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from '../hooks/useEmployees';
 import type { EmployeeFormData } from '../schemas/employeeSchema';
 import { useHasRole } from '../components/RoleGuard';
+import { extractErrorMessage } from '../utils/errorHandler';
 
 const formFieldClass = 'w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent';
 
@@ -33,7 +34,7 @@ function EmployeesPage() {
 
   // Estado del servidor: la lista de empleados, filtrada. TanStack Query se encarga
   // de pedirla, cachearla y mantenerla sincronizada, sin useEffect ni useState.
-  const { data, isLoading: loading, isError, error: queryError } = useEmployees({
+    const { data, isLoading: loading, isError, isFetching, error: queryError, refetch } = useEmployees({
     search: search || undefined,
     department: selectedDepartment || undefined,
     status: selectedStatus || undefined,
@@ -196,14 +197,19 @@ function EmployeesPage() {
       )}
 
       {/* Estado de error */}
-      {isError && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <p className="text-red-700 font-medium">Error al cargar los empleados</p>
-          <p className="text-red-500 text-sm mt-1">
-            {(queryError as Error)?.message || 'Error desconocido'}
-          </p>
-        </div>
-      )}
+         {isError && (
+     <div className="max-w-md mx-auto bg-white border border-red-200 rounded-xl shadow-sm p-6 text-center">
+       <p className="text-red-700 font-semibold">No se pudo cargar la lista de empleados</p>
+       <p className="text-slate-600 text-sm mt-2">{extractErrorMessage(queryError)}</p>
+       <button
+         onClick={() => refetch()}
+         disabled={isFetching}
+         className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+       >
+         {isFetching ? 'Reintentando...' : 'Reintentar'}
+       </button>
+     </div>
+   )}
 
       {/* Sin resultados */}
       {!loading && !isError && employees.length === 0 && (
